@@ -34,32 +34,24 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _climbOffset;
     [SerializeField]
     private float _climbSpeed;
+    [SerializeField]
+    private Transform _cameraTransform;
+    [SerializeField]
+    private CameraManager _cameraManager;
+
 
     private PlayerStance _playerStance;
-
-
     private Rigidbody _rigidbody;
-
     private float _speed;
     private bool isGrounded;
-    private void CheckStep()
-    {
-        bool isHitLower = Physics.Raycast(_groundCheck.position, transform.forward, _stepCheckerDistance);
-        bool isHitUpper = Physics.Raycast(_groundCheck.position + _upperStepOffset, transform.forward, _stepCheckerDistance);
-
-        if (isHitLower && !isHitUpper)
-        {
-            _rigidbody.AddForce(0, stepForce * Time.deltaTime, 0);
-        }
-    }
-
-
     
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _speed = _walkSpeed;
         _playerStance = PlayerStance.Standing;
+        HideAndLockcursor();
     }
     private void Start()
     {
@@ -85,6 +77,12 @@ public class PlayerMovement : MonoBehaviour
         CheckStep();
     }
 
+    private void HideAndLockcursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
     private void Move(Vector2 axisDirection)
     {
         Vector3 movementDirection = Vector3.zero;
@@ -93,13 +91,26 @@ public class PlayerMovement : MonoBehaviour
 
         if(isStanding)
         {
-
-            if(axisDirection.magnitude >= 0.1)
+            switch(_cameraManager._cameraState)
             {
-               float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg;
-                transform.rotation = Quaternion.Euler(0f, rotationAngle, 0f);
-                movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
-                _rigidbody.velocity = movementDirection * _speed * Time.deltaTime;
+                case CameraState.ThirdPerson:
+                    if(axisDirection.magnitude >= 0.1)
+                    {
+                        float rotationAngle = Mathf.Atan2(axisDirection.x, axisDirection.y) * Mathf.Rad2Deg + _cameraTransform.eulerAngles.y;
+                        transform.rotation = Quaternion.Euler(0f, rotationAngle, 0f);
+                        movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
+                        _rigidbody.AddForce(movementDirection * _speed * Time.deltaTime);
+                    }
+                break;
+                case CameraState.FirstPerson:
+                    transform.rotation = Quaternion.Euler(0f, _cameraTransform.eulerAngles.y, 0f);
+                    Vector3 verticalMovement = transform.forward * axisDirection.y;
+                    Vector3 horizontalMovement = transform.right * axisDirection.x;
+                    movementDirection = verticalMovement + horizontalMovement;
+                    _rigidbody.AddForce(movementDirection * _speed * Time.deltaTime);   
+                break;
+                default:
+                break;
             }
         }
         else if(isClimbing)
@@ -134,7 +145,7 @@ public class PlayerMovement : MonoBehaviour
         if(isGrounded)
         {
             Vector3 jumpDirection = Vector3.up;
-            _rigidbody.AddForce(jumpDirection * _jumpForce * Time.deltaTime);
+            _rigidbody.AddForce(jumpDirection * _jumpForce);
         }
     }
 
@@ -169,6 +180,17 @@ public class PlayerMovement : MonoBehaviour
             _rigidbody.useGravity = true;
             transform.position -= transform.forward;
             _speed = _walkSpeed;
+        }
+    }
+
+    private void CheckStep()
+    {
+        bool isHitLower = Physics.Raycast(_groundCheck.position, transform.forward, _stepCheckerDistance);
+        bool isHitUpper = Physics.Raycast(_groundCheck.position + _upperStepOffset, transform.forward, _stepCheckerDistance);
+
+        if (isHitLower && !isHitUpper)
+        {
+            _rigidbody.AddForce(0, stepForce * Time.deltaTime, 0);
         }
     }
 }
