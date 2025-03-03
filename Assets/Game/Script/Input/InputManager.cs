@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
     public Action OnJumpInput;
     public Action OnClimbInput;
     public Action OnCancelInput;
+    public Action OnChangePOV; // Mengganti state kamera menggunakan Key C
     private void Update()
     {
         CheckMovementInput();
@@ -72,7 +73,8 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            Debug.Log("Change POV");
+            if (OnChangePOV != null)
+            OnChangePOV();
         }
     }
 
