@@ -7,10 +7,14 @@ public class InputManager : MonoBehaviour
 {
     public Action<Vector2> OnMoveInput;
     public Action<bool> OnSprintInput;
-    public Action OnJumpInput;
-    public Action OnClimbInput;
-    public Action OnCancelInput;
+    public Action OnJumpInput; //Jump menggunakan Key 'Space'
+    public Action OnClimbInput; //Climb menggunakan Key E
+    public Action OnCancelInput; //Cancel climb menggunakan Key F
     public Action OnChangePOV; // Mengganti state kamera menggunakan Key C
+    public Action OncrouchInput; //Crouch menggunakan Key LeftControl
+    public Action OnGlideInput; //Glide menggunakan Key Q
+    public Action OnCancelGlide; //Cancel glide menggunakan Key F
+    public Action OnPunchInput; //Punch menggunakan Mouse kiri
     private void Update()
     {
         CheckMovementInput();
@@ -65,7 +69,8 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-            Debug.Log("Crouch");
+            if (OncrouchInput != null)
+            OncrouchInput();
         }
     }
 
@@ -90,7 +95,8 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log("Glide");
+            if (OnGlideInput != null)
+            OnGlideInput();
         }
     }
 
@@ -100,14 +106,19 @@ public class InputManager : MonoBehaviour
         {
             if (OnCancelInput != null)
             OnCancelInput();
+            
+            if (OnCancelGlide != null)
+            OnCancelGlide();
         }
+
     }
 
     private void CheckPunchInput()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Debug.Log("Punch");
+            if (OnPunchInput != null)
+            OnPunchInput();
         }
     }
 
