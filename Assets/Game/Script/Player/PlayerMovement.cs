@@ -59,6 +59,8 @@ public class PlayerMovement : MonoBehaviour
     private float _hitDetectorRadius;
     [SerializeField]
     private LayerMask _hitLayer;
+    [SerializeField]
+    private PlayerAudioManager _audioManager;
 
 
     private PlayerStance _playerStance;
@@ -70,7 +72,6 @@ public class PlayerMovement : MonoBehaviour
     private bool _isPunching;
     private int _combo;
     private Coroutine _resetCombo;
-    
 
     private void Awake()
     {
@@ -316,6 +317,7 @@ public class PlayerMovement : MonoBehaviour
             _playerStance = PlayerStance.Glide;
             _animator.SetBool("IsGlide", true);
             _cameraManager.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
+            _audioManager.playGlideSFX();
         }
     }
 
@@ -326,6 +328,7 @@ public class PlayerMovement : MonoBehaviour
             _playerStance = PlayerStance.Standing;
             _animator.SetBool("IsGlide", false);
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
+            _audioManager.stopGlideSFX();
         }
     }
 

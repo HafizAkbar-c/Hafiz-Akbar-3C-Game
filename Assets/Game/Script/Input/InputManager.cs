@@ -15,6 +15,7 @@ public class InputManager : MonoBehaviour
     public Action OnGlideInput; //Glide menggunakan Key Q
     public Action OnCancelGlide; //Cancel glide menggunakan Key F
     public Action OnPunchInput; //Punch menggunakan Mouse kiri
+    public Action OnMainMenuInput; //Main Menu menggunakan Key Escape
     private void Update()
     {
         CheckMovementInput();
@@ -126,7 +127,8 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("Main Menu");
+            if (OnMainMenuInput != null)
+            OnMainMenuInput();
         }
     }
 }
